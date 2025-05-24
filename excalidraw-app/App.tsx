@@ -434,20 +434,22 @@ const ExcalidrawWrapper = () => {
             return acc;
           }, [] as FileId[]) || [];
 
-        if (data.isExternalScene) {
-          loadFilesFromFirebase(
-            `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
-            data.key,
-            fileIds,
-          ).then(({ loadedFiles, erroredFiles }) => {
-            excalidrawAPI.addFiles(loadedFiles);
-            updateStaleImageStatuses({
-              excalidrawAPI,
-              erroredFiles,
-              elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
-            });
-          });
-        } else if (isInitialLoad) {
+        // KAIR0S_DISABLE_FIREBASE_FILE_LOADING_EXTERNAL_SCENE
+        // if (data.isExternalScene) {
+        //   loadFilesFromFirebase(
+        //     `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
+        //     data.key,
+        //     fileIds,
+        //   ).then(({ loadedFiles, erroredFiles }) => {
+        //     excalidrawAPI.addFiles(loadedFiles);
+        //     updateStaleImageStatuses({
+        //       excalidrawAPI,
+        //       erroredFiles,
+        //       elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
+        //     });
+        //   });
+        // } else
+        if (isInitialLoad) {
           if (fileIds.length) {
             LocalData.fileStorage
               .getFiles(fileIds)
@@ -800,9 +802,11 @@ const ExcalidrawWrapper = () => {
   return (
     <div
       style={{ height: "100%" }}
-      className={clsx("excalidraw-app", {
-        "is-collaborating": isCollaborating,
-      })}
+      // KAIR0S_COLLAB_UI_DISABLED: Remove is-collaborating class
+      // className={clsx("excalidraw-app", {
+      //   "is-collaborating": isCollaborating,
+      // })}
+      className="excalidraw-app"
     >
       <Excalidraw
         excalidrawAPI={excalidrawRefCallback}
@@ -855,12 +859,13 @@ const ExcalidrawWrapper = () => {
           return (
             <div className="top-right-ui">
               {collabError.message && <CollabError collabError={collabError} />}
-              <LiveCollaborationTrigger
+              {/* KAIR0S_DISABLE_LIVE_COLLABORATION_TRIGGER */}
+              {/* <LiveCollaborationTrigger
                 isCollaborating={isCollaborating}
                 onSelect={() =>
                   setShareDialogState({ isOpen: true, type: "share" })
                 }
-              />
+              /> */}
             </div>
           );
         }}
@@ -919,9 +924,10 @@ const ExcalidrawWrapper = () => {
             setErrorMessage={setErrorMessage}
           />
         )}
-        {excalidrawAPI && !isCollabDisabled && (
+        {/* KAIR0S_COLLAB_UI_DISABLED: Remove Collab component */}
+        {/* {excalidrawAPI && !isCollabDisabled && (
           <Collab excalidrawAPI={excalidrawAPI} />
-        )}
+        )} */}
 
         <ShareDialog
           collabAPI={collabAPI}
@@ -961,10 +967,11 @@ const ExcalidrawWrapper = () => {
               ],
               icon: usersIcon,
               perform: () => {
-                setShareDialogState({
-                  isOpen: true,
-                  type: "collaborationOnly",
-                });
+                // KAIR0S_DISABLE_SHARE_DIALOG
+                // setShareDialogState({
+                //   isOpen: true,
+                //   type: "collaborationOnly",
+                // });
               },
             },
             {
@@ -1006,7 +1013,8 @@ const ExcalidrawWrapper = () => {
                 "invite",
               ],
               perform: async () => {
-                setShareDialogState({ isOpen: true, type: "share" });
+                // KAIR0S_DISABLE_SHARE_DIALOG
+                // setShareDialogState({ isOpen: true, type: "share" });
               },
             },
             {

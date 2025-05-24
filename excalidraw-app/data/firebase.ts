@@ -53,35 +53,39 @@ try {
   FIREBASE_CONFIG = {};
 }
 
-let firebaseApp: ReturnType<typeof initializeApp> | null = null;
-let firestore: ReturnType<typeof getFirestore> | null = null;
-let firebaseStorage: ReturnType<typeof getStorage> | null = null;
+// KAIR0S_FIREBASE_NEUTRALIZED
+// let firebaseApp: ReturnType<typeof initializeApp> | null = null;
+// let firestore: ReturnType<typeof getFirestore> | null = null;
+// let firebaseStorage: ReturnType<typeof getStorage> | null = null;
 
-const _initializeFirebase = () => {
-  if (!firebaseApp) {
-    firebaseApp = initializeApp(FIREBASE_CONFIG);
-  }
-  return firebaseApp;
-};
+// const _initializeFirebase = () => {
+//   if (!firebaseApp) {
+//     firebaseApp = initializeApp(FIREBASE_CONFIG);
+//   }
+//   return firebaseApp;
+// };
 
-const _getFirestore = () => {
-  if (!firestore) {
-    firestore = getFirestore(_initializeFirebase());
-  }
-  return firestore;
-};
+// const _getFirestore = () => {
+//   if (!firestore) {
+//     firestore = getFirestore(_initializeFirebase());
+//   }
+//   return firestore;
+// };
 
-const _getStorage = () => {
-  if (!firebaseStorage) {
-    firebaseStorage = getStorage(_initializeFirebase());
-  }
-  return firebaseStorage;
-};
+// const _getStorage = () => {
+//   if (!firebaseStorage) {
+//     firebaseStorage = getStorage(_initializeFirebase());
+//   }
+//   return firebaseStorage;
+// };
 
 // -----------------------------------------------------------------------------
 
 export const loadFirebaseStorage = async () => {
-  return _getStorage();
+  // KAIR0S_FIREBASE_NEUTRALIZED
+  console.warn("KAIR0S: loadFirebaseStorage has been neutralized.");
+  return null;
+  // return _getStorage();
 };
 
 type FirebaseStoredScene = {
@@ -149,26 +153,29 @@ export const saveFilesToFirebase = async ({
   prefix: string;
   files: { id: FileId; buffer: Uint8Array }[];
 }) => {
-  const storage = await loadFirebaseStorage();
+  // KAIR0S_FIREBASE_NEUTRALIZED
+  console.warn("KAIR0S: saveFilesToFirebase has been neutralized.");
+  return { savedFiles: [], erroredFiles: files.map(f => f.id) };
+  // const storage = await loadFirebaseStorage();
 
-  const erroredFiles: FileId[] = [];
-  const savedFiles: FileId[] = [];
+  // const erroredFiles: FileId[] = [];
+  // const savedFiles: FileId[] = [];
 
-  await Promise.all(
-    files.map(async ({ id, buffer }) => {
-      try {
-        const storageRef = ref(storage, `${prefix}/${id}`);
-        await uploadBytes(storageRef, buffer, {
-          cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
-        });
-        savedFiles.push(id);
-      } catch (error: any) {
-        erroredFiles.push(id);
-      }
-    }),
-  );
+  // await Promise.all(
+  //   files.map(async ({ id, buffer }) => {
+  //     try {
+  //       const storageRef = ref(storage, `${prefix}/${id}`);
+  //       await uploadBytes(storageRef, buffer, {
+  //         cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
+  //       });
+  //       savedFiles.push(id);
+  //     } catch (error: any) {
+  //       erroredFiles.push(id);
+  //     }
+  //   }),
+  // );
 
-  return { savedFiles, erroredFiles };
+  // return { savedFiles, erroredFiles };
 };
 
 const createFirebaseSceneDocument = async (
@@ -189,61 +196,64 @@ export const saveToFirebase = async (
   elements: readonly SyncableExcalidrawElement[],
   appState: AppState,
 ) => {
-  const { roomId, roomKey, socket } = portal;
-  if (
-    // bail if no room exists as there's nothing we can do at this point
-    !roomId ||
-    !roomKey ||
-    !socket ||
-    isSavedToFirebase(portal, elements)
-  ) {
-    return null;
-  }
+  // KAIR0S_FIREBASE_NEUTRALIZED
+  console.warn("KAIR0S: saveToFirebase has been neutralized.");
+  return null;
+  // const { roomId, roomKey, socket } = portal;
+  // if (
+  //   // bail if no room exists as there's nothing we can do at this point
+  //   !roomId ||
+  //   !roomKey ||
+  //   !socket ||
+  //   isSavedToFirebase(portal, elements)
+  // ) {
+  //   return null;
+  // }
 
-  const firestore = _getFirestore();
-  const docRef = doc(firestore, "scenes", roomId);
+  // const firestore = _getFirestore();
+  // const docRef = doc(firestore, "scenes", roomId);
 
-  const storedScene = await runTransaction(firestore, async (transaction) => {
-    const snapshot = await transaction.get(docRef);
+  // const storedScene = await runTransaction(firestore, async (transaction) => {
+  //   const snapshot = await transaction.get(docRef);
 
-    if (!snapshot.exists()) {
-      const storedScene = await createFirebaseSceneDocument(elements, roomKey);
+  //   if (!snapshot.exists()) {
+  //     const storedScene = await createFirebaseSceneDocument(elements, roomKey);
 
-      transaction.set(docRef, storedScene);
+  //     transaction.set(docRef, storedScene);
 
-      return storedScene;
-    }
+  //     return storedScene;
+  //   }
 
-    const prevStoredScene = snapshot.data() as FirebaseStoredScene;
-    const prevStoredElements = getSyncableElements(
-      restoreElements(await decryptElements(prevStoredScene, roomKey), null),
-    );
-    const reconciledElements = getSyncableElements(
-      reconcileElements(
-        elements,
-        prevStoredElements as OrderedExcalidrawElement[] as RemoteExcalidrawElement[],
-        appState,
-      ),
-    );
+  //   const prevStoredScene = snapshot.data() as FirebaseStoredScene;
+  //   const prevStoredElements = getSyncableElements(
+  //     restoreElements(await decryptElements(prevStoredScene, roomKey), null),
+  //   );
+  //   const reconciledElements = getSyncableElements(
+  //     reconcileElements(
+  //       elements,
+  //       prevStoredElements as OrderedExcalidrawElement[] as RemoteExcalidrawElement[],
+  //       appState,
+  //     ),
+  //   );
 
-    const storedScene = await createFirebaseSceneDocument(
-      reconciledElements,
-      roomKey,
-    );
+  //   const storedScene = await createFirebaseSceneDocument(
+  //     reconciledElements,
+  //     roomKey,
+  //   );
 
-    transaction.update(docRef, storedScene);
+  //   transaction.update(docRef, storedScene);
 
-    // Return the stored elements as the in memory `reconciledElements` could have mutated in the meantime
-    return storedScene;
-  });
+  //   // Return the stored elements as the in memory `reconciledElements` could have mutated in the meantime
+  //   return storedScene;
+  // });
 
-  const storedElements = getSyncableElements(
-    restoreElements(await decryptElements(storedScene, roomKey), null),
-  );
+  // const storedElements = getSyncableElements(
+  //   restoreElements(await decryptElements(storedScene, roomKey), null),
+  // );
 
-  FirebaseSceneVersionCache.set(socket, storedElements);
+  // FirebaseSceneVersionCache.set(socket, storedElements);
 
-  return storedElements;
+  // return storedElements;
 };
 
 export const loadFromFirebase = async (
@@ -251,22 +261,25 @@ export const loadFromFirebase = async (
   roomKey: string,
   socket: Socket | null,
 ): Promise<readonly SyncableExcalidrawElement[] | null> => {
-  const firestore = _getFirestore();
-  const docRef = doc(firestore, "scenes", roomId);
-  const docSnap = await getDoc(docRef);
-  if (!docSnap.exists()) {
-    return null;
-  }
-  const storedScene = docSnap.data() as FirebaseStoredScene;
-  const elements = getSyncableElements(
-    restoreElements(await decryptElements(storedScene, roomKey), null),
-  );
+  // KAIR0S_FIREBASE_NEUTRALIZED
+  console.warn("KAIR0S: loadFromFirebase has been neutralized.");
+  return null;
+  // const firestore = _getFirestore();
+  // const docRef = doc(firestore, "scenes", roomId);
+  // const docSnap = await getDoc(docRef);
+  // if (!docSnap.exists()) {
+  //   return null;
+  // }
+  // const storedScene = docSnap.data() as FirebaseStoredScene;
+  // const elements = getSyncableElements(
+  //   restoreElements(await decryptElements(storedScene, roomKey), null),
+  // );
 
-  if (socket) {
-    FirebaseSceneVersionCache.set(socket, elements);
-  }
+  // if (socket) {
+  //   FirebaseSceneVersionCache.set(socket, elements);
+  // }
 
-  return elements;
+  // return elements;
 };
 
 export const loadFilesFromFirebase = async (
@@ -274,44 +287,47 @@ export const loadFilesFromFirebase = async (
   decryptionKey: string,
   filesIds: readonly FileId[],
 ) => {
-  const loadedFiles: BinaryFileData[] = [];
-  const erroredFiles = new Map<FileId, true>();
+  // KAIR0S_FIREBASE_NEUTRALIZED
+  console.warn("KAIR0S: loadFilesFromFirebase has been neutralized.");
+  return { loadedFiles: [], erroredFiles: new Map() };
+  // const loadedFiles: BinaryFileData[] = [];
+  // const erroredFiles = new Map<FileId, true>();
 
-  await Promise.all(
-    [...new Set(filesIds)].map(async (id) => {
-      try {
-        const url = `https://firebasestorage.googleapis.com/v0/b/${
-          FIREBASE_CONFIG.storageBucket
-        }/o/${encodeURIComponent(prefix.replace(/^\//, ""))}%2F${id}`;
-        const response = await fetch(`${url}?alt=media`);
-        if (response.status < 400) {
-          const arrayBuffer = await response.arrayBuffer();
+  // await Promise.all(
+  //   [...new Set(filesIds)].map(async (id) => {
+  //     try {
+  //       const url = `https://firebasestorage.googleapis.com/v0/b/${
+  //         FIREBASE_CONFIG.storageBucket
+  //       }/o/${encodeURIComponent(prefix.replace(/^\//, ""))}%2F${id}`;
+  //       const response = await fetch(`${url}?alt=media`);
+  //       if (response.status < 400) {
+  //         const arrayBuffer = await response.arrayBuffer();
 
-          const { data, metadata } = await decompressData<BinaryFileMetadata>(
-            new Uint8Array(arrayBuffer),
-            {
-              decryptionKey,
-            },
-          );
+  //         const { data, metadata } = await decompressData<BinaryFileMetadata>(
+  //           new Uint8Array(arrayBuffer),
+  //           {
+  //             decryptionKey,
+  //           },
+  //         );
 
-          const dataURL = new TextDecoder().decode(data) as DataURL;
+  //         const dataURL = new TextDecoder().decode(data) as DataURL;
 
-          loadedFiles.push({
-            mimeType: metadata.mimeType || MIME_TYPES.binary,
-            id,
-            dataURL,
-            created: metadata?.created || Date.now(),
-            lastRetrieved: metadata?.created || Date.now(),
-          });
-        } else {
-          erroredFiles.set(id, true);
-        }
-      } catch (error: any) {
-        erroredFiles.set(id, true);
-        console.error(error);
-      }
-    }),
-  );
+  //         loadedFiles.push({
+  //           mimeType: metadata.mimeType || MIME_TYPES.binary,
+  //           id,
+  //           dataURL,
+  //           created: metadata?.created || Date.now(),
+  //           lastRetrieved: metadata?.created || Date.now(),
+  //         });
+  //       } else {
+  //         erroredFiles.set(id, true);
+  //       }
+  //     } catch (error: any) {
+  //       erroredFiles.set(id, true);
+  //       console.error(error);
+  //     }
+  //   }),
+  // );
 
-  return { loadedFiles, erroredFiles };
+  // return { loadedFiles, erroredFiles };
 };

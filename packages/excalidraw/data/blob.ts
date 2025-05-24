@@ -88,8 +88,8 @@ export const getMimeType = (blob: Blob | string): string => {
     }
     name = blob.name || "";
   }
-  if (/\.(excalidraw|json)$/.test(name)) {
-    return MIME_TYPES.json;
+  if (/\.(excalidraw|kair0s|json)$/.test(name)) { // KAIR0S_FILE_EXTENSION_LOAD
+    return MIME_TYPES.excalidraw; // KAIR0S_FILE_EXTENSION_LOAD: Treat as excalidraw for now
   } else if (/\.png$/.test(name)) {
     return MIME_TYPES.png;
   } else if (/\.jpe?g$/.test(name)) {
@@ -105,7 +105,7 @@ export const getFileHandleType = (handle: FileSystemHandle | null) => {
     return null;
   }
 
-  return handle.name.match(/\.(json|excalidraw|png|svg)$/)?.[1] || null;
+  return handle.name.match(/\.(json|excalidraw|kair0s|png|svg)$/)?.[1] || null; // KAIR0S_FILE_EXTENSION_LOAD
 };
 
 export const isImageFileHandleType = (
@@ -464,10 +464,10 @@ export const normalizeFile = async (file: File) => {
         MIME_TYPES.excalidrawlib,
         file.name,
       );
-    } else if (file?.name?.endsWith(".excalidraw")) {
+    } else if (file?.name?.endsWith(".excalidraw") || file?.name?.endsWith(".kair0s")) { // KAIR0S_FILE_EXTENSION_LOAD
       file = createFile(
         await blobToArrayBuffer(file),
-        MIME_TYPES.excalidraw,
+        MIME_TYPES.excalidraw, // KAIR0S_FILE_EXTENSION_LOAD: Treat as excalidraw
         file.name,
       );
     } else {

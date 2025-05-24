@@ -29,18 +29,20 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.SaveToActiveFile />
       <MainMenu.DefaultItems.Export />
       <MainMenu.DefaultItems.SaveAsImage />
-      {props.isCollabEnabled && (
+      {/* KAIR0S_DISABLE_LIVE_COLLABORATION_TRIGGER_MAIN_MENU */}
+      {/* {props.isCollabEnabled && (
         <MainMenu.DefaultItems.LiveCollaborationTrigger
           isCollaborating={props.isCollaborating}
           onSelect={() => props.onCollabDialogOpen()}
         />
-      )}
+      )} */}
       <MainMenu.DefaultItems.CommandPalette className="highlighted" />
       <MainMenu.DefaultItems.SearchMenu />
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
-      <MainMenu.ItemLink
+      {/* KAIR0S_PLUS_LINK_HERE */}
+      {/* <MainMenu.ItemLink
         icon={ExcalLogo}
         href={`${
           import.meta.env.VITE_APP_PLUS_LP
@@ -48,9 +50,11 @@ export const AppMainMenu: React.FC<{
         className=""
       >
         Excalidraw+
-      </MainMenu.ItemLink>
-      <MainMenu.DefaultItems.Socials />
-      <MainMenu.ItemLink
+      </MainMenu.ItemLink> */}
+      {/* KAIR0S_SOCIALS_LINKS_HERE */}
+      {/* <MainMenu.DefaultItems.Socials /> */}
+      {/* KAIR0S_SIGN_IN_UP_LINK_HERE */}
+      {/* <MainMenu.ItemLink
         icon={loginIcon}
         href={`${import.meta.env.VITE_APP_PLUS_APP}${
           isExcalidrawPlusSignedUser ? "" : "/sign-up"
@@ -58,7 +62,7 @@ export const AppMainMenu: React.FC<{
         className="highlighted"
       >
         {isExcalidrawPlusSignedUser ? "Sign in" : "Sign up"}
-      </MainMenu.ItemLink>
+      </MainMenu.ItemLink> */}
       {isDevEnv() && (
         <MainMenu.Item
           icon={eyeIcon}

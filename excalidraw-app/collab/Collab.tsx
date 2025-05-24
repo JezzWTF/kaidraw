@@ -152,8 +152,9 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         if (!roomId || !roomKey) {
           throw new AbortError();
         }
-
-        return loadFilesFromFirebase(`files/rooms/${roomId}`, roomKey, fileIds);
+        // KAIR0S_TODO: Refactor or remove this feature due to Firebase decoupling.
+        // return loadFilesFromFirebase(`files/rooms/${roomId}`, roomKey, fileIds);
+        return { loadedFiles: [], erroredFiles: new Map() };
       },
       saveFiles: async ({ addedFiles }) => {
         const { roomId, roomKey } = this.portal;
@@ -161,14 +162,18 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           throw new AbortError();
         }
 
-        const { savedFiles, erroredFiles } = await saveFilesToFirebase({
-          prefix: `${FIREBASE_STORAGE_PREFIXES.collabFiles}/${roomId}`,
-          files: await encodeFilesForUpload({
-            files: addedFiles,
-            encryptionKey: roomKey,
-            maxBytes: FILE_UPLOAD_MAX_BYTES,
-          }),
-        });
+        // KAIR0S_TODO: Refactor or remove this feature due to Firebase decoupling.
+        // const { savedFiles, erroredFiles } = await saveFilesToFirebase({
+        //   prefix: `${FIREBASE_STORAGE_PREFIXES.collabFiles}/${roomId}`,
+        //   files: await encodeFilesForUpload({
+        //     files: addedFiles,
+        //     encryptionKey: roomKey,
+        //     maxBytes: FILE_UPLOAD_MAX_BYTES,
+        //   }),
+        // });
+        const savedFiles: FileId[] = [];
+        const erroredFiles: FileId[] = Array.from(addedFiles.keys());
+
 
         return {
           savedFiles: savedFiles.reduce(
@@ -202,24 +207,25 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   private onUmmount: (() => void) | null = null;
 
   componentDidMount() {
-    window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
-    window.addEventListener("online", this.onOfflineStatusToggle);
-    window.addEventListener("offline", this.onOfflineStatusToggle);
-    window.addEventListener(EVENT.UNLOAD, this.onUnload);
+    // KAIR0S_COLLAB_FEATURE_DISABLED: Disabling event listeners for collaboration
+    // window.addEventListener(EVENT.BEFORE_UNLOAD, this.beforeUnload);
+    // window.addEventListener("online", this.onOfflineStatusToggle);
+    // window.addEventListener("offline", this.onOfflineStatusToggle);
+    // window.addEventListener(EVENT.UNLOAD, this.onUnload);
 
-    const unsubOnUserFollow = this.excalidrawAPI.onUserFollow((payload) => {
-      this.portal.socket && this.portal.broadcastUserFollowed(payload);
-    });
-    const throttledRelayUserViewportBounds = throttleRAF(
-      this.relayVisibleSceneBounds,
-    );
-    const unsubOnScrollChange = this.excalidrawAPI.onScrollChange(() =>
-      throttledRelayUserViewportBounds(),
-    );
-    this.onUmmount = () => {
-      unsubOnUserFollow();
-      unsubOnScrollChange();
-    };
+    // const unsubOnUserFollow = this.excalidrawAPI.onUserFollow((payload) => {
+    //   this.portal.socket && this.portal.broadcastUserFollowed(payload);
+    // });
+    // const throttledRelayUserViewportBounds = throttleRAF(
+    //   this.relayVisibleSceneBounds,
+    // );
+    // const unsubOnScrollChange = this.excalidrawAPI.onScrollChange(() =>
+    //   throttledRelayUserViewportBounds(),
+    // );
+    // this.onUmmount = () => {
+    //   unsubOnUserFollow();
+    //   unsubOnScrollChange();
+    // };
 
     this.onOfflineStatusToggle();
 
@@ -281,48 +287,52 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   };
 
   private onUnload = () => {
-    this.destroySocketClient({ isUnload: true });
+    // KAIR0S_COLLAB_FEATURE_DISABLED
+    // this.destroySocketClient({ isUnload: true });
   };
 
   private beforeUnload = withBatchedUpdates((event: BeforeUnloadEvent) => {
-    const syncableElements = getSyncableElements(
-      this.getSceneElementsIncludingDeleted(),
-    );
+    // KAIR0S_COLLAB_FEATURE_DISABLED
+    // const syncableElements = getSyncableElements(
+    //   this.getSceneElementsIncludingDeleted(),
+    // );
 
-    if (
-      this.isCollaborating() &&
-      (this.fileManager.shouldPreventUnload(syncableElements) ||
-        !isSavedToFirebase(this.portal, syncableElements))
-    ) {
-      // this won't run in time if user decides to leave the site, but
-      //  the purpose is to run in immediately after user decides to stay
-      this.saveCollabRoomToFirebase(syncableElements);
+    // if (
+    //   this.isCollaborating() &&
+    //   (this.fileManager.shouldPreventUnload(syncableElements) ||
+    //     !isSavedToFirebase(this.portal, syncableElements))
+    // ) {
+    //   // this won't run in time if user decides to leave the site, but
+    //   //  the purpose is to run in immediately after user decides to stay
+    //   this.saveCollabRoomToFirebase(syncableElements);
 
-      if (import.meta.env.VITE_APP_DISABLE_PREVENT_UNLOAD !== "true") {
-        preventUnload(event);
-      } else {
-        console.warn(
-          "preventing unload disabled (VITE_APP_DISABLE_PREVENT_UNLOAD)",
-        );
-      }
-    }
+    //   if (import.meta.env.VITE_APP_DISABLE_PREVENT_UNLOAD !== "true") {
+    //     preventUnload(event);
+    //   } else {
+    //     console.warn(
+    //       "preventing unload disabled (VITE_APP_DISABLE_PREVENT_UNLOAD)",
+    //     );
+    //   }
+    // }
   });
 
   saveCollabRoomToFirebase = async (
     syncableElements: readonly SyncableExcalidrawElement[],
   ) => {
     try {
-      const storedElements = await saveToFirebase(
-        this.portal,
-        syncableElements,
-        this.excalidrawAPI.getAppState(),
-      );
+      // KAIR0S_TODO: Refactor or remove this feature due to Firebase decoupling.
+      // const storedElements = await saveToFirebase(
+      //   this.portal,
+      //   syncableElements,
+      //   this.excalidrawAPI.getAppState(),
+      // );
 
-      this.resetErrorIndicator();
+      // this.resetErrorIndicator();
 
-      if (this.isCollaborating() && storedElements) {
-        this.handleRemoteSceneUpdate(this._reconcileElements(storedElements));
-      }
+      // if (this.isCollaborating() && storedElements) {
+      //   this.handleRemoteSceneUpdate(this._reconcileElements(storedElements));
+      // }
+      console.warn("KAIR0S: saveCollabRoomToFirebase saveToFirebase call neutralized");
     } catch (error: any) {
       const errorMessage = /is longer than.*?bytes/.test(error.message)
         ? t("errors.collabSaveFailed_sizeExceeded")
@@ -350,66 +360,70 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   };
 
   stopCollaboration = (keepRemoteState = true) => {
-    this.queueBroadcastAllElements.cancel();
-    this.queueSaveToFirebase.cancel();
-    this.loadImageFiles.cancel();
-    this.resetErrorIndicator(true);
+    // KAIR0S_COLLAB_FEATURE_DISABLED
+    // this.queueBroadcastAllElements.cancel();
+    // this.queueSaveToFirebase.cancel();
+    // this.loadImageFiles.cancel();
+    // this.resetErrorIndicator(true);
 
-    this.saveCollabRoomToFirebase(
-      getSyncableElements(
-        this.excalidrawAPI.getSceneElementsIncludingDeleted(),
-      ),
-    );
+    // this.saveCollabRoomToFirebase(
+    //   getSyncableElements(
+    //     this.excalidrawAPI.getSceneElementsIncludingDeleted(),
+    //   ),
+    // );
 
-    if (this.portal.socket && this.fallbackInitializationHandler) {
-      this.portal.socket.off(
-        "connect_error",
-        this.fallbackInitializationHandler,
-      );
-    }
+    // if (this.portal.socket && this.fallbackInitializationHandler) {
+    //   this.portal.socket.off(
+    //     "connect_error",
+    //     this.fallbackInitializationHandler,
+    //   );
+    // }
 
-    if (!keepRemoteState) {
-      LocalData.fileStorage.reset();
-      this.destroySocketClient();
-    } else if (window.confirm(t("alerts.collabStopOverridePrompt"))) {
-      // hack to ensure that we prefer we disregard any new browser state
-      // that could have been saved in other tabs while we were collaborating
-      resetBrowserStateVersions();
+    // if (!keepRemoteState) {
+    //   LocalData.fileStorage.reset();
+    //   this.destroySocketClient();
+    // } else if (window.confirm(t("alerts.collabStopOverridePrompt"))) {
+    //   // hack to ensure that we prefer we disregard any new browser state
+    //   // that could have been saved in other tabs while we were collaborating
+    //   resetBrowserStateVersions();
 
-      window.history.pushState({}, APP_NAME, window.location.origin);
-      this.destroySocketClient();
+    //   window.history.pushState({}, APP_NAME, window.location.origin);
+    //   this.destroySocketClient();
 
-      LocalData.fileStorage.reset();
+    //   LocalData.fileStorage.reset();
 
-      const elements = this.excalidrawAPI
-        .getSceneElementsIncludingDeleted()
-        .map((element) => {
-          if (isImageElement(element) && element.status === "saved") {
-            return newElementWith(element, { status: "pending" });
-          }
-          return element;
-        });
+    //   const elements = this.excalidrawAPI
+    //     .getSceneElementsIncludingDeleted()
+    //     .map((element) => {
+    //       if (isImageElement(element) && element.status === "saved") {
+    //         return newElementWith(element, { status: "pending" });
+    //       }
+    //       return element;
+    //     });
 
-      this.excalidrawAPI.updateScene({
-        elements,
-        captureUpdate: CaptureUpdateAction.NEVER,
-      });
-    }
+    //   this.excalidrawAPI.updateScene({
+    //     elements,
+    //     captureUpdate: CaptureUpdateAction.NEVER,
+    //   });
+    // }
+    console.warn("KAIR0S: stopCollaboration has been neutralized.");
   };
 
   private destroySocketClient = (opts?: { isUnload: boolean }) => {
-    this.lastBroadcastedOrReceivedSceneVersion = -1;
-    this.portal.close();
-    this.fileManager.reset();
-    if (!opts?.isUnload) {
-      this.setIsCollaborating(false);
-      this.setActiveRoomLink(null);
-      this.collaborators = new Map();
-      this.excalidrawAPI.updateScene({
-        collaborators: this.collaborators,
-      });
-      LocalData.resumeSave("collaboration");
-    }
+    // KAIR0S_COLLAB_FEATURE_DISABLED
+    // this.lastBroadcastedOrReceivedSceneVersion = -1;
+    // this.portal.close();
+    // this.fileManager.reset();
+    // if (!opts?.isUnload) {
+    //   this.setIsCollaborating(false);
+    //   this.setActiveRoomLink(null);
+    //   this.collaborators = new Map();
+    //   this.excalidrawAPI.updateScene({
+    //     collaborators: this.collaborators,
+    //   });
+    //   LocalData.resumeSave("collaboration");
+    // }
+    console.warn("KAIR0S: destroySocketClient has been neutralized.");
   };
 
   private fetchImageFilesFromFirebase = async (opts: {
@@ -466,229 +480,232 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   startCollaboration = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ) => {
-    if (!this.state.username) {
-      import("@excalidraw/random-username").then(({ getRandomUsername }) => {
-        const username = getRandomUsername();
-        this.setUsername(username);
-      });
-    }
+    // KAIR0S_COLLAB_FEATURE_DISABLED
+    console.warn("KAIR0S: startCollaboration has been neutralized.");
+    // if (!this.state.username) {
+    //   import("@excalidraw/random-username").then(({ getRandomUsername }) => {
+    //     const username = getRandomUsername();
+    //     this.setUsername(username);
+    //   });
+    // }
 
-    if (this.portal.socket) {
-      return null;
-    }
+    // if (this.portal.socket) {
+    //   return null;
+    // }
 
-    let roomId;
-    let roomKey;
+    // let roomId;
+    // let roomKey;
 
-    if (existingRoomLinkData) {
-      ({ roomId, roomKey } = existingRoomLinkData);
-    } else {
-      ({ roomId, roomKey } = await generateCollaborationLinkData());
-      window.history.pushState(
-        {},
-        APP_NAME,
-        getCollaborationLink({ roomId, roomKey }),
-      );
-    }
+    // if (existingRoomLinkData) {
+    //   ({ roomId, roomKey } = existingRoomLinkData);
+    // } else {
+    //   ({ roomId, roomKey } = await generateCollaborationLinkData());
+    //   window.history.pushState(
+    //     {},
+    //     APP_NAME,
+    //     getCollaborationLink({ roomId, roomKey }),
+    //   );
+    // }
 
-    // TODO: `ImportedDataState` type here seems abused
-    const scenePromise = resolvablePromise<
-      | (ImportedDataState & { elements: readonly OrderedExcalidrawElement[] })
-      | null
-    >();
+    // // TODO: `ImportedDataState` type here seems abused
+    // const scenePromise = resolvablePromise<
+    //   | (ImportedDataState & { elements: readonly OrderedExcalidrawElement[] })
+    //   | null
+    // >();
 
-    this.setIsCollaborating(true);
-    LocalData.pauseSave("collaboration");
+    // this.setIsCollaborating(true);
+    // LocalData.pauseSave("collaboration");
 
-    const { default: socketIOClient } = await import(
-      /* webpackChunkName: "socketIoClient" */ "socket.io-client"
-    );
+    // const { default: socketIOClient } = await import(
+    //   /* webpackChunkName: "socketIoClient" */ "socket.io-client"
+    // );
 
-    const fallbackInitializationHandler = () => {
-      this.initializeRoom({
-        roomLinkData: existingRoomLinkData,
-        fetchScene: true,
-      }).then((scene) => {
-        scenePromise.resolve(scene);
-      });
-    };
-    this.fallbackInitializationHandler = fallbackInitializationHandler;
+    // const fallbackInitializationHandler = () => {
+    //   this.initializeRoom({
+    //     roomLinkData: existingRoomLinkData,
+    //     fetchScene: true,
+    //   }).then((scene) => {
+    //     scenePromise.resolve(scene);
+    //   });
+    // };
+    // this.fallbackInitializationHandler = fallbackInitializationHandler;
 
-    try {
-      this.portal.socket = this.portal.open(
-        socketIOClient(import.meta.env.VITE_APP_WS_SERVER_URL, {
-          transports: ["websocket", "polling"],
-        }),
-        roomId,
-        roomKey,
-      );
+    // try {
+    //   this.portal.socket = this.portal.open(
+    //     socketIOClient(import.meta.env.VITE_APP_WS_SERVER_URL, {
+    //       transports: ["websocket", "polling"],
+    //     }),
+    //     roomId,
+    //     roomKey,
+    //   );
 
-      this.portal.socket.once("connect_error", fallbackInitializationHandler);
-    } catch (error: any) {
-      console.error(error);
-      this.setErrorDialog(error.message);
-      return null;
-    }
+    //   this.portal.socket.once("connect_error", fallbackInitializationHandler);
+    // } catch (error: any) {
+    //   console.error(error);
+    //   this.setErrorDialog(error.message);
+    //   return null;
+    // }
 
-    if (!existingRoomLinkData) {
-      const elements = this.excalidrawAPI.getSceneElements().map((element) => {
-        if (isImageElement(element) && element.status === "saved") {
-          return newElementWith(element, { status: "pending" });
-        }
-        return element;
-      });
-      // remove deleted elements from elements array to ensure we don't
-      // expose potentially sensitive user data in case user manually deletes
-      // existing elements (or clears scene), which would otherwise be persisted
-      // to database even if deleted before creating the room.
-      this.excalidrawAPI.updateScene({
-        elements,
-        captureUpdate: CaptureUpdateAction.NEVER,
-      });
+    // if (!existingRoomLinkData) {
+    //   const elements = this.excalidrawAPI.getSceneElements().map((element) => {
+    //     if (isImageElement(element) && element.status === "saved") {
+    //       return newElementWith(element, { status: "pending" });
+    //     }
+    //     return element;
+    //   });
+    //   // remove deleted elements from elements array to ensure we don't
+    //   // expose potentially sensitive user data in case user manually deletes
+    //   // existing elements (or clears scene), which would otherwise be persisted
+    //   // to database even if deleted before creating the room.
+    //   this.excalidrawAPI.updateScene({
+    //     elements,
+    //     captureUpdate: CaptureUpdateAction.NEVER,
+    //   });
 
-      this.saveCollabRoomToFirebase(getSyncableElements(elements));
-    }
+    //   this.saveCollabRoomToFirebase(getSyncableElements(elements));
+    // }
 
-    // fallback in case you're not alone in the room but still don't receive
-    // initial SCENE_INIT message
-    this.socketInitializationTimer = window.setTimeout(
-      fallbackInitializationHandler,
-      INITIAL_SCENE_UPDATE_TIMEOUT,
-    );
+    // // fallback in case you're not alone in the room but still don't receive
+    // // initial SCENE_INIT message
+    // this.socketInitializationTimer = window.setTimeout(
+    //   fallbackInitializationHandler,
+    //   INITIAL_SCENE_UPDATE_TIMEOUT,
+    // );
 
-    // All socket listeners are moving to Portal
-    this.portal.socket.on(
-      "client-broadcast",
-      async (encryptedData: ArrayBuffer, iv: Uint8Array) => {
-        if (!this.portal.roomKey) {
-          return;
-        }
+    // // All socket listeners are moving to Portal
+    // this.portal.socket.on(
+    //   "client-broadcast",
+    //   async (encryptedData: ArrayBuffer, iv: Uint8Array) => {
+    //     if (!this.portal.roomKey) {
+    //       return;
+    //     }
 
-        const decryptedData = await this.decryptPayload(
-          iv,
-          encryptedData,
-          this.portal.roomKey,
-        );
+    //     const decryptedData = await this.decryptPayload(
+    //       iv,
+    //       encryptedData,
+    //       this.portal.roomKey,
+    //     );
 
-        switch (decryptedData.type) {
-          case WS_SUBTYPES.INVALID_RESPONSE:
-            return;
-          case WS_SUBTYPES.INIT: {
-            if (!this.portal.socketInitialized) {
-              this.initializeRoom({ fetchScene: false });
-              const remoteElements = decryptedData.payload.elements;
-              const reconciledElements =
-                this._reconcileElements(remoteElements);
-              this.handleRemoteSceneUpdate(reconciledElements);
-              // noop if already resolved via init from firebase
-              scenePromise.resolve({
-                elements: reconciledElements,
-                scrollToContent: true,
-              });
-            }
-            break;
-          }
-          case WS_SUBTYPES.UPDATE:
-            this.handleRemoteSceneUpdate(
-              this._reconcileElements(decryptedData.payload.elements),
-            );
-            break;
-          case WS_SUBTYPES.MOUSE_LOCATION: {
-            const { pointer, button, username, selectedElementIds } =
-              decryptedData.payload;
+    //     switch (decryptedData.type) {
+    //       case WS_SUBTYPES.INVALID_RESPONSE:
+    //         return;
+    //       case WS_SUBTYPES.INIT: {
+    //         if (!this.portal.socketInitialized) {
+    //           this.initializeRoom({ fetchScene: false });
+    //           const remoteElements = decryptedData.payload.elements;
+    //           const reconciledElements =
+    //             this._reconcileElements(remoteElements);
+    //           this.handleRemoteSceneUpdate(reconciledElements);
+    //           // noop if already resolved via init from firebase
+    //           scenePromise.resolve({
+    //             elements: reconciledElements,
+    //             scrollToContent: true,
+    //           });
+    //         }
+    //         break;
+    //       }
+    //       case WS_SUBTYPES.UPDATE:
+    //         this.handleRemoteSceneUpdate(
+    //           this._reconcileElements(decryptedData.payload.elements),
+    //         );
+    //         break;
+    //       case WS_SUBTYPES.MOUSE_LOCATION: {
+    //         const { pointer, button, username, selectedElementIds } =
+    //           decryptedData.payload;
 
-            const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
-              decryptedData.payload.socketId ||
-              // @ts-ignore legacy, see #2094 (#2097)
-              decryptedData.payload.socketID;
+    //         const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
+    //           decryptedData.payload.socketId ||
+    //           // @ts-ignore legacy, see #2094 (#2097)
+    //           decryptedData.payload.socketID;
 
-            this.updateCollaborator(socketId, {
-              pointer,
-              button,
-              selectedElementIds,
-              username,
-            });
+    //         this.updateCollaborator(socketId, {
+    //           pointer,
+    //           button,
+    //           selectedElementIds,
+    //           username,
+    //         });
 
-            break;
-          }
+    //         break;
+    //       }
 
-          case WS_SUBTYPES.USER_VISIBLE_SCENE_BOUNDS: {
-            const { sceneBounds, socketId } = decryptedData.payload;
+    //       case WS_SUBTYPES.USER_VISIBLE_SCENE_BOUNDS: {
+    //         const { sceneBounds, socketId } = decryptedData.payload;
 
-            const appState = this.excalidrawAPI.getAppState();
+    //         const appState = this.excalidrawAPI.getAppState();
 
-            // we're not following the user
-            // (shouldn't happen, but could be late message or bug upstream)
-            if (appState.userToFollow?.socketId !== socketId) {
-              console.warn(
-                `receiving remote client's (from ${socketId}) viewport bounds even though we're not subscribed to it!`,
-              );
-              return;
-            }
+    //         // we're not following the user
+    //         // (shouldn't happen, but could be late message or bug upstream)
+    //         if (appState.userToFollow?.socketId !== socketId) {
+    //           console.warn(
+    //             `receiving remote client's (from ${socketId}) viewport bounds even though we're not subscribed to it!`,
+    //           );
+    //           return;
+    //         }
 
-            // cross-follow case, ignore updates in this case
-            if (
-              appState.userToFollow &&
-              appState.followedBy.has(appState.userToFollow.socketId)
-            ) {
-              return;
-            }
+    //         // cross-follow case, ignore updates in this case
+    //         if (
+    //           appState.userToFollow &&
+    //           appState.followedBy.has(appState.userToFollow.socketId)
+    //         ) {
+    //           return;
+    //         }
 
-            this.excalidrawAPI.updateScene({
-              appState: zoomToFitBounds({
-                appState,
-                bounds: sceneBounds,
-                fitToViewport: true,
-                viewportZoomFactor: 1,
-              }).appState,
-            });
+    //         this.excalidrawAPI.updateScene({
+    //           appState: zoomToFitBounds({
+    //             appState,
+    //             bounds: sceneBounds,
+    //             fitToViewport: true,
+    //             viewportZoomFactor: 1,
+    //           }).appState,
+    //         });
 
-            break;
-          }
+    //         break;
+    //       }
 
-          case WS_SUBTYPES.IDLE_STATUS: {
-            const { userState, socketId, username } = decryptedData.payload;
-            this.updateCollaborator(socketId, {
-              userState,
-              username,
-            });
-            break;
-          }
+    //       case WS_SUBTYPES.IDLE_STATUS: {
+    //         const { userState, socketId, username } = decryptedData.payload;
+    //         this.updateCollaborator(socketId, {
+    //           userState,
+    //           username,
+    //         });
+    //         break;
+    //       }
 
-          default: {
-            assertNever(decryptedData, null);
-          }
-        }
-      },
-    );
+    //       default: {
+    //         assertNever(decryptedData, null);
+    //       }
+    //     }
+    //   },
+    // );
 
-    this.portal.socket.on("first-in-room", async () => {
-      if (this.portal.socket) {
-        this.portal.socket.off("first-in-room");
-      }
-      const sceneData = await this.initializeRoom({
-        fetchScene: true,
-        roomLinkData: existingRoomLinkData,
-      });
-      scenePromise.resolve(sceneData);
-    });
+    // this.portal.socket.on("first-in-room", async () => {
+    //   if (this.portal.socket) {
+    //     this.portal.socket.off("first-in-room");
+    //   }
+    //   const sceneData = await this.initializeRoom({
+    //     fetchScene: true,
+    //     roomLinkData: existingRoomLinkData,
+    //   });
+    //   scenePromise.resolve(sceneData);
+    // });
 
-    this.portal.socket.on(
-      WS_EVENTS.USER_FOLLOW_ROOM_CHANGE,
-      (followedBy: SocketId[]) => {
-        this.excalidrawAPI.updateScene({
-          appState: { followedBy: new Set(followedBy) },
-        });
+    // this.portal.socket.on(
+    //   WS_EVENTS.USER_FOLLOW_ROOM_CHANGE,
+    //   (followedBy: SocketId[]) => {
+    //     this.excalidrawAPI.updateScene({
+    //       appState: { followedBy: new Set(followedBy) },
+    //     });
 
-        this.relayVisibleSceneBounds({ force: true });
-      },
-    );
+    //     this.relayVisibleSceneBounds({ force: true });
+    //   },
+    // );
 
-    this.initializeIdleDetector();
+    // this.initializeIdleDetector();
 
-    this.setActiveRoomLink(window.location.href);
+    // this.setActiveRoomLink(window.location.href);
 
-    return scenePromise;
+    // return scenePromise;
+    return null;
   };
 
   private initializeRoom = async ({
@@ -711,21 +728,23 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.excalidrawAPI.resetScene();
 
       try {
-        const elements = await loadFromFirebase(
-          roomLinkData.roomId,
-          roomLinkData.roomKey,
-          this.portal.socket,
-        );
-        if (elements) {
-          this.setLastBroadcastedOrReceivedSceneVersion(
-            getSceneVersion(elements),
-          );
+        // KAIR0S_TODO: Refactor or remove this feature due to Firebase decoupling.
+        // const elements = await loadFromFirebase(
+        //   roomLinkData.roomId,
+        //   roomLinkData.roomKey,
+        //   this.portal.socket,
+        // );
+        // if (elements) {
+        //   this.setLastBroadcastedOrReceivedSceneVersion(
+        //     getSceneVersion(elements),
+        //   );
 
-          return {
-            elements,
-            scrollToContent: true,
-          };
-        }
+        //   return {
+        //     elements,
+        //     scrollToContent: true,
+        //   };
+        // }
+        console.warn("KAIR0S: initializeRoom loadFromFirebase call neutralized");
       } catch (error: any) {
         // log the error and move on. other peers will sync us the scene.
         console.error(error);
@@ -744,11 +763,14 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     const localElements = this.getSceneElementsIncludingDeleted();
     const appState = this.excalidrawAPI.getAppState();
     const restoredRemoteElements = restoreElements(remoteElements, null);
-    const reconciledElements = reconcileElements(
-      localElements,
-      restoredRemoteElements as RemoteExcalidrawElement[],
-      appState,
-    );
+    // KAIR0S_DISABLE_RECONCILE_ELEMENTS
+    // const reconciledElements = reconcileElements(
+    //   localElements,
+    //   restoredRemoteElements as RemoteExcalidrawElement[],
+    //   appState,
+    // );
+    const reconciledElements = restoredRemoteElements as ReconciledExcalidrawElement[];
+
 
     // Avoid broadcasting to the rest of the collaborators the scene
     // we just received!
@@ -762,18 +784,20 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   };
 
   private loadImageFiles = throttle(async () => {
-    const { loadedFiles, erroredFiles } =
-      await this.fetchImageFilesFromFirebase({
-        elements: this.excalidrawAPI.getSceneElementsIncludingDeleted(),
-      });
+    // KAIR0S_TODO: Refactor or remove this feature due to Firebase decoupling.
+    // const { loadedFiles, erroredFiles } =
+    //   await this.fetchImageFilesFromFirebase({
+    //     elements: this.excalidrawAPI.getSceneElementsIncludingDeleted(),
+    //   });
 
-    this.excalidrawAPI.addFiles(loadedFiles);
+    // this.excalidrawAPI.addFiles(loadedFiles);
 
-    updateStaleImageStatuses({
-      excalidrawAPI: this.excalidrawAPI,
-      erroredFiles,
-      elements: this.excalidrawAPI.getSceneElementsIncludingDeleted(),
-    });
+    // updateStaleImageStatuses({
+    //   excalidrawAPI: this.excalidrawAPI,
+    //   erroredFiles,
+    //   elements: this.excalidrawAPI.getSceneElementsIncludingDeleted(),
+    // });
+    console.warn("KAIR0S: loadImageFiles (fetchImageFilesFromFirebase) call neutralized");
   }, LOAD_IMAGES_TIMEOUT);
 
   private handleRemoteSceneUpdate = (
@@ -784,7 +808,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       captureUpdate: CaptureUpdateAction.NEVER,
     });
 
-    this.loadImageFiles();
+    // KAIR0S_DISABLE_LOAD_IMAGE_FILES
+    // this.loadImageFiles();
   };
 
   private onPointerMove = () => {
@@ -837,41 +862,44 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   };
 
   private initializeIdleDetector = () => {
-    document.addEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
-    document.addEventListener(EVENT.VISIBILITY_CHANGE, this.onVisibilityChange);
+    // KAIR0S_COLLAB_FEATURE_DISABLED
+    // document.addEventListener(EVENT.POINTER_MOVE, this.onPointerMove);
+    // document.addEventListener(EVENT.VISIBILITY_CHANGE, this.onVisibilityChange);
   };
 
   setCollaborators(sockets: SocketId[]) {
-    const collaborators: InstanceType<typeof Collab>["collaborators"] =
-      new Map();
-    for (const socketId of sockets) {
-      collaborators.set(
-        socketId,
-        Object.assign({}, this.collaborators.get(socketId), {
-          isCurrentUser: socketId === this.portal.socket?.id,
-        }),
-      );
-    }
-    this.collaborators = collaborators;
-    this.excalidrawAPI.updateScene({ collaborators });
+    // KAIR0S_COLLAB_FEATURE_DISABLED
+    // const collaborators: InstanceType<typeof Collab>["collaborators"] =
+    //   new Map();
+    // for (const socketId of sockets) {
+    //   collaborators.set(
+    //     socketId,
+    //     Object.assign({}, this.collaborators.get(socketId), {
+    //       isCurrentUser: socketId === this.portal.socket?.id,
+    //     }),
+    //   );
+    // }
+    // this.collaborators = collaborators;
+    // this.excalidrawAPI.updateScene({ collaborators });
   }
 
   updateCollaborator = (socketId: SocketId, updates: Partial<Collaborator>) => {
-    const collaborators = new Map(this.collaborators);
-    const user: Mutable<Collaborator> = Object.assign(
-      {},
-      collaborators.get(socketId),
-      updates,
-      {
-        isCurrentUser: socketId === this.portal.socket?.id,
-      },
-    );
-    collaborators.set(socketId, user);
-    this.collaborators = collaborators;
+    // KAIR0S_COLLAB_FEATURE_DISABLED
+    // const collaborators = new Map(this.collaborators);
+    // const user: Mutable<Collaborator> = Object.assign(
+    //   {},
+    //   collaborators.get(socketId),
+    //   updates,
+    //   {
+    //     isCurrentUser: socketId === this.portal.socket?.id,
+    //   },
+    // );
+    // collaborators.set(socketId, user);
+    // this.collaborators = collaborators;
 
-    this.excalidrawAPI.updateScene({
-      collaborators,
-    });
+    // this.excalidrawAPI.updateScene({
+    //   collaborators,
+    // });
   };
 
   public setLastBroadcastedOrReceivedSceneVersion = (version: number) => {

@@ -19,11 +19,12 @@ export const AppFooter = React.memo(
           }}
         >
           {isVisualDebuggerEnabled() && <DebugFooter onChange={onChange} />}
-          {isExcalidrawPlusSignedUser ? (
+          {/* KAIR0S_FOOTER_CONTENT_HERE */}
+          {/* {isExcalidrawPlusSignedUser ? (
             <ExcalidrawPlusAppLink />
           ) : (
             <EncryptedIcon />
-          )}
+          )} */}
         </div>
       </Footer>
     );
