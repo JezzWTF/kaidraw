@@ -1,16 +1,16 @@
-import { loginIcon } from "@excalidraw/excalidraw/components/icons";
-import { POINTER_EVENTS } from "@excalidraw/common";
-import { useI18n } from "@excalidraw/excalidraw/i18n";
+// import { loginIcon } from "@excalidraw/excalidraw/components/icons"; // KAIR0S_ESLINT_CLEANUP - Unused
+// import { POINTER_EVENTS } from "@excalidraw/common"; // KAIR0S_ESLINT_CLEANUP - Unused
+// import { useI18n } from "@excalidraw/excalidraw/i18n"; // KAIR0S_ESLINT_CLEANUP - Unused
 import { WelcomeScreen } from "@excalidraw/excalidraw/index";
 import React from "react";
 
-import { isExcalidrawPlusSignedUser } from "../app_constants";
+// import { isExcalidrawPlusSignedUser } from "../app_constants"; // KAIR0S_ESLINT_CLEANUP - Unused
 
 export const AppWelcomeScreen: React.FC<{
   onCollabDialogOpen: () => any;
   isCollabEnabled: boolean;
 }> = React.memo((props) => {
-  const { t } = useI18n();
+  // const { t } = useI18n(); // KAIR0S_ESLINT_CLEANUP - Unused
   let headingContent;
 
   // KAIR0S_WELCOME_MESSAGE_HERE

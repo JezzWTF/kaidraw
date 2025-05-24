@@ -227,6 +227,7 @@ export const MIME_TYPES = {
   json: "application/json",
   // excalidraw data
   excalidraw: "application/vnd.excalidraw+json",
+  kair0s: "application/vnd.excalidraw+json", // KAIR0S_FILE_EXTENSION_MIME_TYPE
   excalidrawlib: "application/vnd.excalidrawlib+json",
   // image-encoded excalidraw data
   "excalidraw.svg": "image/svg+xml",

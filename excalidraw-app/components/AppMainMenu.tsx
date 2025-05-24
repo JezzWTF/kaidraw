@@ -1,6 +1,6 @@
 import {
-  loginIcon,
-  ExcalLogo,
+  // loginIcon, // KAIR0S_ESLINT_CLEANUP - Unused
+  // ExcalLogo, // KAIR0S_ESLINT_CLEANUP - Unused
   eyeIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
@@ -11,14 +11,14 @@ import { isDevEnv } from "@excalidraw/common";
 import type { Theme } from "@excalidraw/element/types";
 
 import { LanguageList } from "../app-language/LanguageList";
-import { isExcalidrawPlusSignedUser } from "../app_constants";
+// import { isExcalidrawPlusSignedUser } from "../app_constants"; // KAIR0S_ESLINT_CLEANUP - Unused
 
 import { saveDebugState } from "./DebugCanvas";
 
 export const AppMainMenu: React.FC<{
-  onCollabDialogOpen: () => any;
-  isCollaborating: boolean;
-  isCollabEnabled: boolean;
+  // onCollabDialogOpen: () => any; // KAIR0S_ESLINT_CLEANUP - Unused
+  // isCollaborating: boolean; // KAIR0S_ESLINT_CLEANUP - Unused
+  // isCollabEnabled: boolean; // KAIR0S_ESLINT_CLEANUP - Unused
   theme: Theme | "system";
   setTheme: (theme: Theme | "system") => void;
   refresh: () => void;

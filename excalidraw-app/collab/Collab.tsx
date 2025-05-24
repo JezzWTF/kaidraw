@@ -1,27 +1,20 @@
+// KAIR0S_ESLINT_CLEANUP: Removing many unused imports due to feature neutralization
 import {
   CaptureUpdateAction,
   getSceneVersion,
   restoreElements,
-  zoomToFitBounds,
-  reconcileElements,
 } from "@excalidraw/excalidraw";
 import { ErrorDialog } from "@excalidraw/excalidraw/components/ErrorDialog";
-import { APP_NAME, EVENT } from "@excalidraw/common";
+import { APP_NAME } from "@excalidraw/common";
 import {
-  IDLE_THRESHOLD,
-  ACTIVE_THRESHOLD,
+  // IDLE_THRESHOLD, // KAIR0S_ESLINT_CLEANUP: Unused due to idle detector neutralization
+  // ACTIVE_THRESHOLD, // KAIR0S_ESLINT_CLEANUP: Unused due to idle detector neutralization
   UserIdleState,
-  assertNever,
   isDevEnv,
   isTestEnv,
-  preventUnload,
-  resolvablePromise,
-  throttleRAF,
 } from "@excalidraw/common";
-import { decryptData } from "@excalidraw/excalidraw/data/encryption";
-import { getVisibleSceneBounds } from "@excalidraw/element";
-import { newElementWith } from "@excalidraw/element";
-import { isImageElement, isInitializedImageElement } from "@excalidraw/element";
+// import { newElementWith } from "@excalidraw/element"; // KAIR0S_ESLINT_CLEANUP: Usage in stopCollaboration is commented out
+import { isInitializedImageElement } from "@excalidraw/element";
 import { AbortError } from "@excalidraw/excalidraw/errors";
 import { t } from "@excalidraw/excalidraw/i18n";
 import { withBatchedUpdates } from "@excalidraw/excalidraw/reactUtils";
@@ -31,9 +24,7 @@ import { PureComponent } from "react";
 
 import type {
   ReconciledExcalidrawElement,
-  RemoteExcalidrawElement,
 } from "@excalidraw/excalidraw/data/reconcile";
-import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
 import type {
   ExcalidrawElement,
   FileId,
@@ -45,50 +36,35 @@ import type {
   ExcalidrawImperativeAPI,
   SocketId,
   Collaborator,
-  Gesture,
+  // Gesture, // KAIR0S_ESLINT_CLEANUP: onPointerUpdate is neutralized
 } from "@excalidraw/excalidraw/types";
-import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
 import { appJotaiStore, atom } from "../app-jotai";
 import {
-  CURSOR_SYNC_TIMEOUT,
-  FILE_UPLOAD_MAX_BYTES,
-  FIREBASE_STORAGE_PREFIXES,
-  INITIAL_SCENE_UPDATE_TIMEOUT,
+  // CURSOR_SYNC_TIMEOUT, // KAIR0S_ESLINT_CLEANUP: onPointerUpdate is neutralized
   LOAD_IMAGES_TIMEOUT,
   WS_SUBTYPES,
   SYNC_FULL_SCENE_INTERVAL_MS,
-  WS_EVENTS,
 } from "../app_constants";
 import {
-  generateCollaborationLinkData,
-  getCollaborationLink,
   getSyncableElements,
 } from "../data";
 import {
-  encodeFilesForUpload,
   FileManager,
-  updateStaleImageStatuses,
 } from "../data/FileManager";
-import { LocalData } from "../data/LocalData";
-import {
-  isSavedToFirebase,
-  loadFilesFromFirebase,
-  loadFromFirebase,
-  saveFilesToFirebase,
-  saveToFirebase,
-} from "../data/firebase";
+import { LocalData } from "../data/LocalData"; // KAIR0S_ESLINT_CLEANUP: Potentially unused if stopCollaboration & destroySocketClient are fully neutralized
+// Firebase functions are fully neutralized
 import {
   importUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
 } from "../data/localStorage";
-import { resetBrowserStateVersions } from "../data/tabSync";
+// import { resetBrowserStateVersions } from "../data/tabSync"; // KAIR0S_ESLINT_CLEANUP: stopCollaboration is neutralized
 
 import { collabErrorIndicatorAtom } from "./CollabError";
 import Portal from "./Portal";
 
 import type {
-  SocketUpdateDataSource,
+  // SocketUpdateDataSource, // KAIR0S_ESLINT_CLEANUP: decryptPayload is neutralized
   SyncableExcalidrawElement,
 } from "../data";
 

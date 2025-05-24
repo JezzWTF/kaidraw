@@ -290,40 +290,72 @@ const initializeScene = async (opts: {
 
   if (roomLinkData && opts.collabAPI) {
     const { excalidrawAPI } = opts;
+    // collabScene can be null because startCollaboration was neutralized
+    const collabScene = await opts.collabAPI.startCollaboration(roomLinkData); 
 
-    const scene = await opts.collabAPI.startCollaboration(roomLinkData);
+    let sceneContents: ExcalidrawInitialDataState;
 
-    return {
-      // when collaborating, the state may have already been updated at this
-      // point (we may have received updates from other clients), so reconcile
-      // elements and appState with existing state
-      scene: {
-        ...scene,
-        appState: {
+    if (collabScene) {
+      // collabScene is not null, so we can attempt to use its properties,
+      // providing defaults for nested properties that might be missing.
+      const currentAppState = excalidrawAPI.getAppState(); // Get current app state from API
+      const collabSceneAppState = collabScene.appState || getDefaultAppState(); // Use default if collabScene.appState is null/undefined
+
+      const MergedAppState = {
+          ...collabSceneAppState, // Base with collab appState or default
           ...restoreAppState(
             {
-              ...scene?.appState,
-              theme: localDataState?.appState?.theme || scene?.appState?.theme,
+              ...collabSceneAppState, // Again, ensure a base for restoreAppState
+              theme: localDataState?.appState?.theme || collabSceneAppState.theme || currentAppState.theme,
             },
-            excalidrawAPI.getAppState(),
+            currentAppState, // Provide current app state as second arg
           ),
-          // necessary if we're invoking from a hashchange handler which doesn't
-          // go through App.initializeScene() that resets this flag
           isLoading: false,
+        };
+
+      sceneContents = {
+        elements: collabScene.elements || [], 
+        appState: MergedAppState,
+        files: collabScene.files || {}, 
+        libraryItems: collabScene.libraryItems || [],
+        scrollToContent: collabScene.scrollToContent || false,
+      };
+      
+      // Only reconcile if there are elements to reconcile from collabScene
+      if (collabScene.elements && collabScene.elements.length > 0) {
+          sceneContents.elements = reconcileElements(
+            collabScene.elements as OrderedExcalidrawElement[], 
+            excalidrawAPI.getSceneElementsIncludingDeleted() as RemoteExcalidrawElement[],
+            sceneContents.appState, 
+          );
+      }
+
+    } else {
+      // collabScene is null, provide a default valid initial state
+      const currentAppState = excalidrawAPI.getAppState();
+      sceneContents = {
+        elements: [],
+        appState: {
+          ...getDefaultAppState(), // Base with all default AppState fields
+          ...restoreAppState( 
+            { theme: localDataState?.appState?.theme || currentAppState.theme }, // ensure theme comes from somewhere
+            currentAppState,
+          ),
+          isLoading: false, 
         },
-        elements: reconcileElements(
-          scene?.elements || [],
-          excalidrawAPI.getSceneElementsIncludingDeleted() as RemoteExcalidrawElement[],
-          excalidrawAPI.getAppState(),
-        ),
-      },
+        files: {},
+        libraryItems: [],
+        scrollToContent: true, 
+      };
+    }
+
+    return {
+      scene: sceneContents, 
       isExternalScene: true,
       id: roomLinkData.roomId,
       key: roomLinkData.roomKey,
     };
-  } else if (scene) {
-    return isExternalScene && jsonBackendMatch
-      ? {
+  }
           scene,
           isExternalScene,
           id: jsonBackendMatch[1],

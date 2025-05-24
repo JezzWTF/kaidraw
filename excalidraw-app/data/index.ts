@@ -1,16 +1,17 @@
-import {
-  compressData,
-  decompressData,
-} from "@excalidraw/excalidraw/data/encode";
-import {
-  decryptData,
+// KAIR0S_ESLINT_CLEANUP: Removing unused imports due to feature neutralization
+// import { // KAIR0S_ESLINT_CLEANUP - Unused due to neutralized exportToBackend/importFromBackend
+//   compressData,
+//   decompressData,
+// } from "@excalidraw/excalidraw/data/encode";
+import { // KAIR0S_ESLINT_CLEANUP - generateEncryptionKey is used
+  // decryptData, // KAIR0S_ESLINT_CLEANUP - Unused
   generateEncryptionKey,
-  IV_LENGTH_BYTES,
+  // IV_LENGTH_BYTES, // KAIR0S_ESLINT_CLEANUP - Unused
 } from "@excalidraw/excalidraw/data/encryption";
-import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
+// import { serializeAsJSON } from "@excalidraw/excalidraw/data/json"; // KAIR0S_ESLINT_CLEANUP - Unused
 import { restore } from "@excalidraw/excalidraw/data/restore";
 import { isInvisiblySmallElement } from "@excalidraw/element";
-import { isInitializedImageElement } from "@excalidraw/element";
+// import { isInitializedImageElement } from "@excalidraw/element"; // KAIR0S_ESLINT_CLEANUP - Unused
 import { t } from "@excalidraw/excalidraw/i18n";
 import { bytesToHexString } from "@excalidraw/common";
 
@@ -19,12 +20,12 @@ import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
 import type { SceneBounds } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
-  FileId,
+  // FileId, // KAIR0S_ESLINT_CLEANUP - Unused
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 import type {
   AppState,
-  BinaryFileData,
+  // BinaryFileData, // KAIR0S_ESLINT_CLEANUP - Unused
   BinaryFiles,
   SocketId,
 } from "@excalidraw/excalidraw/types";
@@ -32,12 +33,12 @@ import type { MakeBrand } from "@excalidraw/common/utility-types";
 
 import {
   DELETED_ELEMENT_TIMEOUT,
-  FILE_UPLOAD_MAX_BYTES,
+  // FILE_UPLOAD_MAX_BYTES, // KAIR0S_ESLINT_CLEANUP - Unused
   ROOM_ID_BYTES,
 } from "../app_constants";
 
-import { encodeFilesForUpload } from "./FileManager";
-import { saveFilesToFirebase } from "./firebase";
+// import { encodeFilesForUpload } from "./FileManager"; // KAIR0S_ESLINT_CLEANUP - Unused
+// import { saveFilesToFirebase } from "./firebase"; // KAIR0S_ESLINT_CLEANUP - Unused
 
 import type { WS_SUBTYPES } from "../app_constants";
 
@@ -164,41 +165,42 @@ export const getCollaborationLink = (data: {
   return `${window.location.origin}${window.location.pathname}#room=${data.roomId},${data.roomKey}`;
 };
 
-/**
- * Decodes shareLink data using the legacy buffer format.
- * @deprecated
- */
-const legacy_decodeFromBackend = async ({
-  buffer,
-  decryptionKey,
-}: {
-  buffer: ArrayBuffer;
-  decryptionKey: string;
-}) => {
-  let decrypted: ArrayBuffer;
+// KAIR0S_ESLINT_CLEANUP - legacy_decodeFromBackend is unused as importFromBackend is neutralized
+// /**
+//  * Decodes shareLink data using the legacy buffer format.
+//  * @deprecated
+//  */
+// const legacy_decodeFromBackend = async ({
+//   buffer,
+//   decryptionKey,
+// }: {
+//   buffer: ArrayBuffer;
+//   decryptionKey: string;
+// }) => {
+//   let decrypted: ArrayBuffer;
 
-  try {
-    // Buffer should contain both the IV (fixed length) and encrypted data
-    const iv = buffer.slice(0, IV_LENGTH_BYTES);
-    const encrypted = buffer.slice(IV_LENGTH_BYTES, buffer.byteLength);
-    decrypted = await decryptData(new Uint8Array(iv), encrypted, decryptionKey);
-  } catch (error: any) {
-    // Fixed IV (old format, backward compatibility)
-    const fixedIv = new Uint8Array(IV_LENGTH_BYTES);
-    decrypted = await decryptData(fixedIv, buffer, decryptionKey);
-  }
+//   try {
+//     // Buffer should contain both the IV (fixed length) and encrypted data
+//     const iv = buffer.slice(0, IV_LENGTH_BYTES);
+//     const encrypted = buffer.slice(IV_LENGTH_BYTES, buffer.byteLength);
+//     decrypted = await decryptData(new Uint8Array(iv), encrypted, decryptionKey);
+//   } catch (error: any) {
+//     // Fixed IV (old format, backward compatibility)
+//     const fixedIv = new Uint8Array(IV_LENGTH_BYTES);
+//     decrypted = await decryptData(fixedIv, buffer, decryptionKey);
+//   }
 
-  // We need to convert the decrypted array buffer to a string
-  const string = new window.TextDecoder("utf-8").decode(
-    new Uint8Array(decrypted),
-  );
-  const data: ImportedDataState = JSON.parse(string);
+//   // We need to convert the decrypted array buffer to a string
+//   const string = new window.TextDecoder("utf-8").decode(
+//     new Uint8Array(decrypted),
+//   );
+//   const data: ImportedDataState = JSON.parse(string);
 
-  return {
-    elements: data.elements || null,
-    appState: data.appState || null,
-  };
-};
+//   return {
+//     elements: data.elements || null,
+//     appState: data.appState || null,
+//   };
+// };
 
 const importFromBackend = async (
   id: string,
@@ -241,7 +243,13 @@ const importFromBackend = async (
   //   console.error(error);
   //   return {};
   // }
-  return { error: "Feature disabled" };
+  // KAIR0S_DISABLE_BACKEND_LOAD
+  console.warn("KAIR0S: importFromBackend has been neutralized.");
+  return Promise.resolve({
+    elements: [],
+    appState: {}, // Consider using getDefaultAppState() or a minimal valid AppState structure
+    // files: {} // Optional, if ImportedDataState requires it
+  });
 };
 
 export const loadScene = async (
