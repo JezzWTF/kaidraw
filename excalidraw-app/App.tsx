@@ -355,10 +355,12 @@ const initializeScene = async (opts: {
       id: roomLinkData.roomId,
       key: roomLinkData.roomKey,
     };
-  }
+  } else if (scene) { // Ensure this else if is correctly placed
+    return isExternalScene && jsonBackendMatch
+      ? {
           scene,
           isExternalScene,
-          id: jsonBackendMatch[1],
+          id: jsonBackendMatch[1], // Comma added after this line as per instruction
           key: jsonBackendMatch[2],
         }
       : { scene, isExternalScene: false };
