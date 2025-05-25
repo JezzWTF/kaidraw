@@ -1,3 +1,23 @@
+import { EVENT, UserIdleState, ValueOf } from "@excalidraw/common";
+import { ExcalidrawImperativeAPI, SocketUpdateDataSource, Gesture, AppState, BinaryFiles, LibraryItems } from "@excalidraw/excalidraw/types";
+import { decryptData } from "@excalidraw/excalidraw/data/encryption";
+import { getVisibleSceneBounds, newElementWith } from "@excalidraw/element";
+import { ReconciledExcalidrawElement, RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
+import { ImportedDataState } from "@excalidraw/excalidraw/data/types";
+import { IDLE_THRESHOLD, ACTIVE_THRESHOLD, CURSOR_SYNC_TIMEOUT, WS_SUBTYPES, SYNC_FULL_SCENE_INTERVAL_MS } from "../app_constants";
+import { ExcalidrawElement, FileId, OrderedExcalidrawElement } from "@excalidraw/element/types";
+import { Socket } from "socket.io-client";
+import { t } from "@excalidraw/excalidraw/i18n";
+import { restoreElements, getSceneVersion } from "@excalidraw/excalidraw";
+import { AbortError } from "@excalidraw/excalidraw/errors";
+import { Collaborator, GestureTransform, PointerCoords, SocketId, UserToFollow, Username } from "@excalidraw/excalidraw/types";
+import { getSyncableElements } from "../data";
+import { FileManager } from "../data/FileManager";
+import { importUsernameFromLocalStorage, saveUsernameToLocalStorage } from "../data/localStorage";
+import Portal from "./Portal";
+import { collabErrorIndicatorAtom } from "./CollabError";
+import { activeRoomLinkAtom, collabAPIAtom, isCollaboratingAtom, isOfflineAtom } from "../app-jotai";
+
 // KAIR0S_ESLINT_CLEANUP: Removing many unused imports due to feature neutralization
 import {
   CaptureUpdateAction,

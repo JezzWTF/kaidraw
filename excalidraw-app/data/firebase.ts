@@ -1,24 +1,23 @@
-// KAIR0S_ESLINT_CLEANUP: Removing most Firebase-specific imports and types
-// import { reconcileElements } from "@excalidraw/excalidraw"; // KAIR0S_ESLINT_CLEANUP - Unused
-// import { MIME_TYPES } from "@excalidraw/common"; // KAIR0S_ESLINT_CLEANUP - Unused
-// import { decompressData } from "@excalidraw/excalidraw/data/encode"; // KAIR0S_ESLINT_CLEANUP - Unused
-// import { // KAIR0S_ESLINT_CLEANUP - Unused
-//   encryptData,
-//   decryptData,
-// } from "@excalidraw/excalidraw/data/encryption";
-// import { restoreElements } from "@excalidraw/excalidraw/data/restore"; // KAIR0S_ESLINT_CLEANUP - Unused
-// import { getSceneVersion } from "@excalidraw/element"; // KAIR0S_ESLINT_CLEANUP - Unused
-// import { initializeApp } from "firebase/app"; // KAIR0S_ESLINT_CLEANUP - Unused
-// import { // KAIR0S_ESLINT_CLEANUP - Unused
-//   getFirestore,
-//   doc,
-//   getDoc,
-//   runTransaction,
-//   Bytes,
-// } from "firebase/firestore";
-// import { getStorage, ref, uploadBytes } from "firebase/storage"; // KAIR0S_ESLINT_CLEANUP - Unused
+import { reconcileElements } from "@excalidraw/excalidraw"; // KAIR0S_ESLINT_CLEANUP - Unused
+import { MIME_TYPES } from "@excalidraw/common"; // KAIR0S_ESLINT_CLEANUP - Unused
+import { decompressData } from "@excalidraw/excalidraw/data/encode"; // KAIR0S_ESLINT_CLEANUP - Unused
+import { // KAIR0S_ESLINT_CLEANUP - Unused
+  encryptData,
+  decryptData,
+} from "@excalidraw/excalidraw/data/encryption";
+import { restoreElements } from "@excalidraw/excalidraw/data/restore"; // KAIR0S_ESLINT_CLEANUP - Unused
+import { getSceneVersion } from "@excalidraw/element"; // KAIR0S_ESLINT_CLEANUP - Unused
+import { initializeApp } from "firebase/app"; // KAIR0S_ESLINT_CLEANUP - Unused
+import { // KAIR0S_ESLINT_CLEANUP - Unused
+  getFirestore,
+  doc,
+  getDoc,
+  runTransaction,
+  Bytes,
+} from "firebase/firestore";
+import { getStorage, ref, uploadBytes } from "firebase/storage"; // KAIR0S_ESLINT_CLEANUP - Unused
 
-// import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile"; // KAIR0S_ESLINT_CLEANUP - Unused
+import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile"; // KAIR0S_ESLINT_CLEANUP - Unused
 import type {
   // ExcalidrawElement, // KAIR0S_ESLINT_CLEANUP - Unused
   FileId,
